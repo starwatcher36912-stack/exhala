@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>EXHALA</title>
+    <style>
+        body { margin: 0; background: #050b1a; color: white; font-family: sans-serif; overflow: hidden; height: 100vh; }
+        
+        #pantallaInicio { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; background: #050b1a; }
+        #logoRedondo { width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, #38bdf8, #4b0082); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; animation: respirar 4s infinite ease-in-out; box-shadow: 0 0 40px #38bdf8; margin-bottom: 50px; }
+        @keyframes respirar { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        #btnEntrar { padding: 15px 40px; background: #38bdf8; border: none; border-radius: 25px; color: #050b1a; font-weight: bold; cursor: pointer; }
+
+        #appPrincipal { display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px; box-sizing: border-box; }
+        #cabecera { text-align: center; margin-top: 10px; }
+        h1 { color: #38bdf8; letter-spacing: 12px; margin: 0; font-size: 40px; }
+        #subtitulo { color: #888; font-size: 16px; margin-top: 5px; letter-spacing: 4px; text-transform: uppercase; }
+        
+        #circulo { width: 300px; height: 300px; border-radius: 50%; border: 4px solid #38bdf8; background: radial-gradient(circle, #4b0082, #050b1a); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.5s ease-in-out; box-shadow: 0 0 30px #4b0082; text-align: center; padding: 20px; }
+        #estado { font-size: 24px; font-weight: bold; }
+        #frase { font-style: italic; color: #d8b4fe; font-size: 14px; margin: 8px 0; opacity: 0.9; } /* Color lavanda */
+        #contador { font-size: 80px; font-weight: bold; }
+        #nombreMed { font-size: 16px; color: #38bdf8; font-weight: bold; margin-top: 5px; }
+        
+        #pie { text-align: center; width: 100%; margin-bottom: 10px; }
+        #progreso { color: #64748b; font-size: 14px; margin-bottom: 15px; }
+        .opciones { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
+        .btn-med { padding: 12px 20px; border-radius: 15px; border: none; color: white; font-weight: bold; cursor: pointer; }
+        #btnControl { width: 100%; max-width: 300px; padding: 15px; background: #334155; color: white; border: none; border-radius: 15px; font-weight: bold; font-size: 16px; }
+        #btnReset { background: none; border: 1px solid #475569; color: #64748b; padding: 2px 8px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <div id="pantallaInicio">
+        <div id="logoRedondo">
+            <h2>EXHALA</h2>
+            <p>TU LUGAR SEGURO</p>
+        </div>
+        <button id="btnEntrar" onclick="document.getElementById('pantallaInicio').style.display='none'; document.getElementById('appPrincipal').style.display='flex';">ENTRAR</button>
+    </div>
+
+    <div id="appPrincipal">
+        <div id="cabecera">
+            <h1>EXHALA</h1>
+            <div id="subtitulo">TU LUGAR SEGURO</div>
+        </div>
+        
+        <div id="circulo">
+            <div id="estado">LISTO</div>
+            <div id="frase">"Habitas el presente"</div>
+            <div id="contador">--</div>
+            <div id="nombreMed"></div>
+        </div>
+
+        <div id="pie">
+            <div id="progreso">Sesiones: <span id="contadorSesiones">0</span> <button id="btnReset" onclick="resetSesiones()">Reiniciar</button></div>
+            <div class="opciones">
+                <button class="btn-med" style="background: #0ea5e9;" onclick="seleccionar('CLARIDAD', 'claridad.mp3', [4, 2, 4])">CLARIDAD</button>
+                <button class="btn-med" style="background: #8b5cf6;" onclick="seleccionar('RELAJACIÓN', 'relajacion.mp3', [4, 4, 6])">RELAJACIÓN</button>
+                <button class="btn-med" style="background: #10b981;" onclick="seleccionar('ADN', 'renova_adn.mp3', [4, 7, 8])">ADN</button>
+            </div>
+            <button id="btnControl" onclick="toggleSession()">INICIAR</button>
+        </div>
+    </div>
+
+    <audio id="player"></audio>
+
+    <script>
+        let sesiones = parseInt(localStorage.getItem('sesiones')) || 0;
+        document.getElementById('contadorSesiones').innerText = sesiones;
+        const frases = ["Habitas el presente", "Estás a salvo", "Tu mente es un océano", "Respira paz", "Todo está en ti"];
+        let cicloInterval = null, isRunning = false, tiemposActuales = null, archivoActual = null;
+        
+        function resetSesiones() { if(confirm("¿Reiniciar contador?")) { sesiones = 0; localStorage.setItem('sesiones', 0); document.getElementById('contadorSesiones').innerText = 0; } }
+        function seleccionar(nombre, archivo, tiempos) {
+            if (isRunning) detener();
+            archivoActual = archivo; tiemposActuales = tiempos;
+            document.getElementById('estado').innerText = "LISTO";
+            document.getElementById('nombreMed').innerText = nombre;
+            document.getElementById('contador').innerText = "--";
+            document.getElementById('frase').innerText = '"' + frases[Math.floor(Math.random() * frases.length)] + '"';
+        }
+        function toggleSession() {
+            if (!isRunning) { if (!archivoActual) { alert("Elige una meditación primero"); return; } iniciar(); }
+            else { detener(); }
+        }
+        function iniciar() {
+            isRunning = true; document.getElementById('btnControl').innerText = "DETENER"; document.getElementById('btnControl').style.background = "#1e3a8a";
+            const player = document.getElementById('player'); player.src = 'audio/' + archivoActual; player.play();
+            let fase = 0, tiempoRestante = tiemposActuales[fase];
+            document.getElementById('contador').innerText = tiempoRestante;
+            const colores = ["#38bdf8", "#8b5cf6", "#10b981"];
+            const circulo = document.getElementById('circulo');
+            cicloInterval = setInterval(() => {
+                tiempoRestante--;
+                if(tiempoRestante < 0) {
+                    fase = (fase + 1) % 3; tiempoRestante = tiemposActuales[fase];
+                    document.getElementById('frase').innerText = '"' + frases[Math.floor(Math.random() * frases.length)] + '"';
+                }
+                document.getElementById('contador').innerText = tiempoRestante;
+                if(fase === 0) { document.getElementById('estado').innerText = "INHALA"; circulo.style.transform = "scale(1.1)"; circulo.style.borderColor = colores[0]; }
+                else if(fase === 1) { document.getElementById('estado').innerText = "RETÉN"; circulo.style.transform = "scale(1.1)"; circulo.style.borderColor = colores[1]; }
+                else { document.getElementById('estado').innerText = "EXHALA"; circulo.style.transform = "scale(1)"; circulo.style.borderColor = colores[2]; }
+            }, 1000);
+        }
+        function detener() {
+            if (isRunning) { sesiones++; localStorage.setItem('sesiones', sesiones); document.getElementById('contadorSesiones').innerText = sesiones; }
+            clearInterval(cicloInterval); document.getElementById('player').pause(); document.getElementById('player').currentTime = 0;
+            isRunning = false; document.getElementById('btnControl').innerText = "INICIAR"; document.getElementById('btnControl').style.background = "#334155";
+            document.getElementById('estado').innerText = "LISTO"; document.getElementById('contador').innerText = "--";
+            document.getElementById('circulo').style.transform = "scale(1)";
+            document.getElementById('circulo').style.borderColor = "#38bdf8";
+        }
+    </script>
+</body>
+</html>
