@@ -2,26 +2,28 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <!-- Etiquetas para que se vea bien al compartir -->
+    <meta property="og:title" content="EXHALA - Tu Lugar Seguro">
+    <meta property="og:description" content="Encuentra claridad, relajación y renovación en un espacio de paz.">
+    <meta property="og:url" content="https://starwatcher36912-stack.github.io/exhala/">
+    <meta property="og:type" content="website">
+    
     <title>EXHALA</title>
     <style>
         body { margin: 0; background: #050b1a; color: white; font-family: sans-serif; overflow: hidden; height: 100vh; }
-        
         #pantallaInicio { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; background: #050b1a; }
         #logoRedondo { width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, #38bdf8, #4b0082); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; animation: respirar 4s infinite ease-in-out; box-shadow: 0 0 40px #38bdf8; margin-bottom: 50px; }
         @keyframes respirar { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
         #btnEntrar { padding: 15px 40px; background: #38bdf8; border: none; border-radius: 25px; color: #050b1a; font-weight: bold; cursor: pointer; }
-
         #appPrincipal { display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px; box-sizing: border-box; }
         #cabecera { text-align: center; margin-top: 10px; }
         h1 { color: #38bdf8; letter-spacing: 12px; margin: 0; font-size: 40px; }
         #subtitulo { color: #888; font-size: 16px; margin-top: 5px; letter-spacing: 4px; text-transform: uppercase; }
-        
         #circulo { width: 300px; height: 300px; border-radius: 50%; border: 4px solid #38bdf8; background: radial-gradient(circle, #4b0082, #050b1a); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.5s ease-in-out; box-shadow: 0 0 30px #4b0082; text-align: center; padding: 20px; }
         #estado { font-size: 24px; font-weight: bold; }
         #frase { font-style: italic; color: #d8b4fe; font-size: 14px; margin: 8px 0; opacity: 0.9; }
         #contador { font-size: 80px; font-weight: bold; }
         #nombreMed { font-size: 16px; color: #38bdf8; font-weight: bold; margin-top: 5px; }
-        
         #pie { text-align: center; width: 100%; margin-bottom: 10px; }
         #progreso { color: #64748b; font-size: 14px; margin-bottom: 15px; }
         .opciones { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
@@ -44,14 +46,12 @@
             <h1>EXHALA</h1>
             <div id="subtitulo">TU LUGAR SEGURO</div>
         </div>
-        
         <div id="circulo">
             <div id="estado">LISTO</div>
             <div id="frase">"Habitas el presente"</div>
             <div id="contador">--</div>
             <div id="nombreMed"></div>
         </div>
-
         <div id="pie">
             <div id="progreso">Sesiones: <span id="contadorSesiones">0</span> <button id="btnReset" onclick="resetSesiones()">Reiniciar</button></div>
             <div class="opciones">
@@ -62,7 +62,6 @@
             <button id="btnControl" onclick="toggleSession()">INICIAR</button>
         </div>
     </div>
-
     <audio id="player"></audio>
 
     <script>
@@ -70,7 +69,6 @@
         document.getElementById('contadorSesiones').innerText = sesiones;
         const frases = ["Habitas el presente", "Estás a salvo", "Tu mente es un océano", "Respira paz", "Todo está en ti"];
         let cicloInterval = null, isRunning = false, tiemposActuales = null, archivoActual = null;
-        
         function resetSesiones() { if(confirm("¿Reiniciar contador?")) { sesiones = 0; localStorage.setItem('sesiones', 0); document.getElementById('contadorSesiones').innerText = 0; } }
         function seleccionar(nombre, archivo, tiempos) {
             if (isRunning) detener();
@@ -86,9 +84,7 @@
         }
         function iniciar() {
             isRunning = true; document.getElementById('btnControl').innerText = "DETENER"; document.getElementById('btnControl').style.background = "#1e3a8a";
-            const player = document.getElementById('player'); 
-            player.src = archivoActual; 
-            player.play();
+            const player = document.getElementById('player'); player.src = archivoActual; player.play();
             let fase = 0, tiempoRestante = tiemposActuales[fase];
             document.getElementById('contador').innerText = tiempoRestante;
             const colores = ["#38bdf8", "#8b5cf6", "#10b981"];
